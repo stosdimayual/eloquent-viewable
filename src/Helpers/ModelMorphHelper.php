@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace CyrildeWit\EloquentViewable\Helpers;
 
+use Illuminate\Container\Container;
+
 class ModelMorphHelper
 {
     public static function getMorphMap(): array
