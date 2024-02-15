@@ -19,6 +19,7 @@ return [
 
         ],
 
+        'morph_map' => [],
     ],
 
     /*

@@ -6,6 +6,7 @@ namespace CyrildeWit\EloquentViewable;
 
 use App\Providers\EloqentServiceProvider;
 use CyrildeWit\EloquentViewable\Contracts\View as ViewContract;
+use CyrildeWit\EloquentViewable\Helpers\ModelMorphHelper;
 use CyrildeWit\EloquentViewable\Support\Period;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Container\BindingResolutionException;
@@ -124,7 +125,7 @@ trait InteractsWithViews
     {
         $games = static::getTableName();
         $views = (new View())->getTable();
-        $gameMorph = EloqentServiceProvider::getMorphMapFor(static::class) ?? static::class;
+        $gameMorph = ModelMorphHelper::getMorphMapFor(static::class) ?? static::class;
 
         return $query->join($views, function (JoinClause $join) use ($id, $views, $games, $gameMorph) {
             if ($id) {
