@@ -9,7 +9,7 @@ use CyrildeWit\EloquentViewable\Contracts\View as ViewContract;
 use CyrildeWit\EloquentViewable\Contracts\Views as ViewsContract;
 use CyrildeWit\EloquentViewable\Contracts\Visitor as VisitorContract;
 use Illuminate\Cache\Repository as CacheRepository;
-use Illuminate\Container\Container;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\ServiceProvider;
 use Jaybizzle\CrawlerDetect\CrawlerDetect;
 
@@ -20,7 +20,7 @@ class EloquentViewableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(): void
     {
         if ($this->app->runningInConsole()) {
             $config = $this->app->config['eloquent-viewable'];
@@ -37,6 +37,8 @@ class EloquentViewableServiceProvider extends ServiceProvider
                 ], 'migrations');
             }
         }
+
+        $this->bootMacros();
     }
 
     /**
@@ -44,7 +46,7 @@ class EloquentViewableServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function register()
+    public function register(): void
     {
         $this->mergeConfigFrom(
             __DIR__ . '/../config/eloquent-viewable.php',
@@ -75,5 +77,23 @@ class EloquentViewableServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(CrawlerDetectorContract::class, CrawlerDetectAdapter::class);
+    }
+
+    protected function bootMacros(): void
+    {
+        Builder::macro('whereBetweenFlexible', function ($column, ?array $values) {
+            /** @var Builder $this */
+            if (is_null($values[0]) && is_null($values[1])) {
+                return $this;
+            }
+            if (is_null($values[0])) {
+                return $this->where($column, '<=', $values[1]);
+            }
+            if (is_null($values[1])) {
+                return $this->where($column, '>=', $values[0]);
+            }
+
+            return $this->whereBetween($column, $values);
+        });
     }
 }

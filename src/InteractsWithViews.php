@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * @method static self|Builder orderByViews(string $direction = 'desc', $period = null, string $collection = null, bool $unique = false, $as = 'views_count')
  * @method static self|Builder recentlyViewedBy(?int $id = null, string $direction = 'desc', ?Period $period = null, ?string $collection = null)
+ * @method static self|Builder viewedBy(?int $id = null, string $direction = 'desc', ?Period $period = null)
  * @method static self|Builder orderByUniqueViews(string $direction = 'desc', $period = null, string $collection = null, string $as = 'unique_views_count')
  **/
 trait InteractsWithViews
@@ -121,8 +122,12 @@ trait InteractsWithViews
         });
     }
 
-    public function scopeViewedBy(Builder $query, ?int $id = null, string $direction = 'desc'): Builder
-    {
+    public function scopeViewedBy(
+        Builder $query,
+        ?int $id = null,
+        string $direction = 'desc',
+        ?Period $period = null
+    ): Builder {
         $games = static::getTableName();
         $views = (new View())->getTable();
         $gameMorph = ModelMorphHelper::getMorphMapFor(static::class) ?? static::class;
@@ -137,6 +142,7 @@ trait InteractsWithViews
         })->select("{$games}.*")
             ->selectRaw("max({$views}.viewed_at) as viewed_at")
             ->groupBy("{$games}.id")
+            ->whereBetweenFlexible('viewed_at', [$period->getStartDateTime(), $period->getEndDateTime()])
             ->reorder('viewed_at', $direction);
     }
 

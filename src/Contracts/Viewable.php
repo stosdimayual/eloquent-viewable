@@ -46,5 +46,5 @@ interface Viewable
      */
     public function scopeRecentlyViewedBy(Builder $query, ?int $id = null, string $direction = 'desc', ?Period $period = null, ?string $collection = null): Builder;
 
-    public function scopeViewedBy(Builder $query, ?int $id = null, string $direction = 'desc'): Builder;
+    public function scopeViewedBy(Builder $query, ?int $id = null, string $direction = 'desc', ?Period $period = null): Builder;
 }
