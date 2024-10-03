@@ -142,7 +142,9 @@ trait InteractsWithViews
         })->select("{$games}.*")
             ->selectRaw("max({$views}.viewed_at) as viewed_at")
             ->groupBy("{$games}.id")
-            ->whereBetweenFlexible('viewed_at', [$period->getStartDateTime(), $period->getEndDateTime()])
+            ->when($period, function ($query) use ($period) {
+                $query->whereBetweenFlexible('viewed_at', [$period->getStartDateTime(), $period->getEndDateTime()]);
+            })
             ->reorder('viewed_at', $direction);
     }
 
